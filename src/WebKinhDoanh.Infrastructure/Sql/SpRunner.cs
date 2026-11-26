@@ -5,18 +5,14 @@ using Npgsql;
 
 namespace WebKinhDoanh.Infrastructure.Sql;
 
-public sealed class SpRunner(IConfiguration configuration)
+public sealed class SpRunner(NpgsqlDataSource dataSource)
 {
-    private readonly string _connectionString =
-        configuration.GetConnectionString("DefaultConnection")
-        ?? throw new InvalidOperationException("Connection string 'DefaultConnection' chưa được cấu hình.");
-
     public async Task<IReadOnlyList<T>> QueryAsync<T>(
         string procedure,
         object? parameters = null,
         CancellationToken cancellationToken = default)
     {
-        await using var connection = new NpgsqlConnection(_connectionString);
+        await using var connection = dataSource.CreateConnection();
         var command = new CommandDefinition(
             procedure,
             parameters,

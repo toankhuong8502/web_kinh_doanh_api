@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using WebKinhDoanh.Application.Interfaces.IRepositories;
 using WebKinhDoanh.Infrastructure.Sql;
 using WebKinhDoanh.Infrastructure.Sql.Repositories;
@@ -19,7 +20,16 @@ public static class DependencyInjection
             throw new InvalidOperationException("Connection string 'DefaultConnection' chưa được cấu hình.");
         }
 
-        services.AddDbContext<StoreDbContext>(options => options.UseNpgsql(connectionString));
+        var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+        dataSourceBuilder.UseSslClientAuthenticationOptionsCallback(sslOptions =>
+        {
+            sslOptions.RemoteCertificateValidationCallback = (_, _, _, _) => true;
+        });
+
+        var dataSource = dataSourceBuilder.Build();
+
+        services.AddSingleton(dataSource);
+        services.AddDbContext<StoreDbContext>(options => options.UseNpgsql(dataSource));
         services.AddScoped<SpRunner>();
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
