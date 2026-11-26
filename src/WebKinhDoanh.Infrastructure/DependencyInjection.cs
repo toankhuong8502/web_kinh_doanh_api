@@ -19,7 +19,7 @@ public static class DependencyInjection
             throw new InvalidOperationException("Connection string 'DefaultConnection' chưa được cấu hình.");
         }
 
-        services.AddDbContext<StoreDbContext>(options => options.UseSqlServer(connectionString));
+        services.AddDbContext<StoreDbContext>(options => options.UseNpgsql(connectionString));
         services.AddScoped<SpRunner>();
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();

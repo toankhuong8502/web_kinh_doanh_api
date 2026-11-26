@@ -4,23 +4,26 @@ Backend cho cửa hàng Mộc Mây, tổ chức theo Clean Architecture trên .N
 
 - `WebKinhDoanh.Domain`: entities và trạng thái đơn hàng.
 - `WebKinhDoanh.Application`: DTO, validation, service và repository contracts.
-- `WebKinhDoanh.Infrastructure`: EF Core 9, SQL Server, migrations, seed data và Dapper.
+- `WebKinhDoanh.Infrastructure`: EF Core 9, PostgreSQL, migrations, seed data và Dapper.
 - `WebKinhDoanh.Api`: REST API, Swagger, CORS và xử lý lỗi thống nhất.
 
 ## Chạy local
 
-Yêu cầu .NET 8 SDK và SQL Server LocalDB. Từ thư mục `web_kinh_doanh_api`:
+Yêu cầu .NET 8 SDK và một PostgreSQL database (ví dụ Neon). Từ thư mục `web_kinh_doanh_api`:
 
 ```powershell
+$env:ConnectionStrings__DefaultConnection = "Host=YOUR_NEON_HOST;Database=YOUR_DATABASE;Username=YOUR_USER;Password=YOUR_PASSWORD;SSL Mode=Require"
 dotnet run --project src\WebKinhDoanh.Api\WebKinhDoanh.Api.csproj
 ```
 
 Mặc định API chạy tại `http://localhost:5181` và `https://localhost:7279`. Khi khởi động, ứng dụng áp dụng EF migrations và thêm danh mục/sản phẩm mẫu nếu catalog còn trống. Swagger chỉ bật trong môi trường Development.
 
-Connection string mặc định nằm trong `src\WebKinhDoanh.Api\appsettings.json`. Có thể override mà không sửa file:
+Trong Neon, lấy host, database, user và password tại mục **Connect** của project; đặt connection string bằng biến môi trường như trên thay vì lưu secret vào source code. Không đưa connection string lên frontend.
+
+Các SQL Server migrations cũ được lưu riêng trong `Sql\Migrations\SqlServer` và không được dùng cho PostgreSQL. Migration `InitialPostgres` đã được tạo sẵn. Sau khi đặt connection string Neon, áp dụng schema lên database:
 
 ```powershell
-$env:ConnectionStrings__DefaultConnection = "Server=localhost;Database=MMTTStore;Trusted_Connection=True;TrustServerCertificate=True"
+dotnet ef database update --project src\WebKinhDoanh.Infrastructure\WebKinhDoanh.Infrastructure.csproj --startup-project src\WebKinhDoanh.Api\WebKinhDoanh.Api.csproj
 ```
 
 Cho phép frontend chạy ở `localhost:5173` hoặc `localhost:4173`. Muốn thêm origin, cập nhật `AllowedOrigins` trong appsettings.

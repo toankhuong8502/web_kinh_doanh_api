@@ -1,7 +1,7 @@
 using System.Data;
 using Dapper;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Npgsql;
 
 namespace WebKinhDoanh.Infrastructure.Sql;
 
@@ -16,7 +16,7 @@ public sealed class SpRunner(IConfiguration configuration)
         object? parameters = null,
         CancellationToken cancellationToken = default)
     {
-        await using var connection = new SqlConnection(_connectionString);
+        await using var connection = new NpgsqlConnection(_connectionString);
         var command = new CommandDefinition(
             procedure,
             parameters,

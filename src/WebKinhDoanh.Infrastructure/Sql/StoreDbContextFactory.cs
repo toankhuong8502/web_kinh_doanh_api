@@ -8,10 +8,15 @@ public sealed class StoreDbContextFactory : IDesignTimeDbContextFactory<StoreDbC
     public StoreDbContext CreateDbContext(string[] args)
     {
         var connectionString =
-            Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
-            ?? "Server=(localdb)\\MSSQLLocalDB;Database=MMTTStore;Trusted_Connection=True;TrustServerCertificate=True";
+            Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            throw new InvalidOperationException(
+                "Set ConnectionStrings__DefaultConnection before running EF Core tooling.");
+        }
+
         var options = new DbContextOptionsBuilder<StoreDbContext>()
-            .UseSqlServer(connectionString)
+            .UseNpgsql(connectionString)
             .Options;
 
         return new StoreDbContext(options);
