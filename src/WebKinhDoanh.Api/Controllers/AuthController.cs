@@ -25,6 +25,15 @@ public sealed class AuthController(IAuthService authService) : ApiControllerBase
         return Success(result, "Tạo tài khoản thành công.");
     }
 
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword(
+        [FromBody] ChangePasswordRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        await authService.ChangePasswordAsync(request, cancellationToken);
+        return SuccessMsg("Đổi mật khẩu thành công.");
+    }
+
     [HttpGet("users")]
     public async Task<IActionResult> GetUsers(CancellationToken cancellationToken = default)
     {

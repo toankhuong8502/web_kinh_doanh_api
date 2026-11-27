@@ -65,6 +65,48 @@ public sealed class AuthService(IUserRepository users) : IAuthService
         return ToResponse(created);
     }
 
+    public async Task ChangePasswordAsync(ChangePasswordRequest request, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(request.Username))
+        {
+            throw new AppException(400, "Tên tài khoản không được để trống.");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.OldPassword))
+        {
+            throw new AppException(400, "Vui lòng nhập mật khẩu cũ.");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.NewPassword))
+        {
+            throw new AppException(400, "Vui lòng nhập mật khẩu mới.");
+        }
+
+        if (request.NewPassword.Trim().Length < 6)
+        {
+            throw new AppException(400, "Mật khẩu mới phải có ít nhất 6 ký tự.");
+        }
+
+        if (request.NewPassword.Trim() != request.ConfirmPassword.Trim())
+        {
+            throw new AppException(400, "Mật khẩu mới và xác nhận mật khẩu không khớp.");
+        }
+
+        var user = await users.GetByUsernameOrEmailAsync(request.Username.Trim(), cancellationToken);
+        if (user is null)
+        {
+            throw new AppException(404, "Không tìm thấy người dùng.");
+        }
+
+        if (!PasswordHasher.Verify(request.OldPassword.Trim(), user.PasswordHash))
+        {
+            throw new AppException(400, "Mật khẩu cũ không chính xác.");
+        }
+
+        user.PasswordHash = PasswordHasher.Hash(request.NewPassword.Trim());
+        await users.UpdateAsync(user, cancellationToken);
+    }
+
     public async Task<LoginResponse?> GetCurrentUserAsync(string username, CancellationToken cancellationToken = default)
     {
         var user = await users.GetByUsernameOrEmailAsync(username, cancellationToken);
