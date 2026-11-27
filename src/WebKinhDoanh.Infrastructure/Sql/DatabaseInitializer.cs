@@ -10,6 +10,24 @@ public static class DatabaseInitializer
         CancellationToken cancellationToken = default)
     {
         await dbContext.Database.MigrateAsync(cancellationToken);
+
+        if (!await dbContext.Users.AnyAsync(cancellationToken))
+        {
+            var admin = new User
+            {
+                Id = Guid.NewGuid(),
+                Username = "admin",
+                Email = "admin@mocmay.vn",
+                FullName = "Admin MMTT",
+                Role = "Admin",
+                PasswordHash = WebKinhDoanh.Application.Common.PasswordHasher.Hash("Admin@123456"),
+                IsActive = true,
+                CreatedAtUtc = DateTime.UtcNow
+            };
+            dbContext.Users.Add(admin);
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+
         if (await dbContext.Categories.AnyAsync(cancellationToken))
         {
             return;

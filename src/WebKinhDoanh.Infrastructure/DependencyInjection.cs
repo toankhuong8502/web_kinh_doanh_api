@@ -61,6 +61,7 @@ public static class DependencyInjection
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IContactMessageRepository, ContactMessageRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
         return services;
     }
 }
