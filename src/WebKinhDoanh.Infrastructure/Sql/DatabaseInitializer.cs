@@ -17,7 +17,7 @@ public static class DatabaseInitializer
             {
                 Id = Guid.NewGuid(),
                 Username = "admin",
-                Email = "admin@mocmay.vn",
+                Email = "admin@mmtt.vn",
                 FullName = "Admin MMTT",
                 Role = "Admin",
                 PasswordHash = WebKinhDoanh.Application.Common.PasswordHasher.Hash("Admin@123456"),
