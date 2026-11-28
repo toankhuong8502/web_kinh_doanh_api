@@ -13,8 +13,14 @@ public interface IProductRepository
         CancellationToken cancellationToken);
 
     Task<Product?> GetByIdAsync(int id, CancellationToken cancellationToken);
+    Task<Product?> GetTrackingByIdAsync(int id, CancellationToken cancellationToken);
     Task<IReadOnlyList<Product>> GetByIdsAsync(
         IReadOnlyCollection<int> ids,
         CancellationToken cancellationToken);
     Task<IReadOnlyList<Category>> GetCategoriesAsync(CancellationToken cancellationToken);
+    Task<Category?> GetCategoryByIdAsync(int id, CancellationToken cancellationToken);
+    Task<Category?> GetCategoryByNameAsync(string name, CancellationToken cancellationToken);
+    Task<Product> AddAsync(Product product, CancellationToken cancellationToken);
+    Task UpdateAsync(Product product, CancellationToken cancellationToken);
+    Task DeleteAsync(Product product, CancellationToken cancellationToken);
 }

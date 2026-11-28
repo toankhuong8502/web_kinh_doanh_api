@@ -55,6 +55,13 @@ public sealed class ProductRepository(StoreDbContext dbContext) : IProductReposi
                 product => product.Id == id && product.IsActive,
                 cancellationToken);
 
+    public Task<Product?> GetTrackingByIdAsync(int id, CancellationToken cancellationToken) =>
+        dbContext.Products
+            .Include(product => product.Category)
+            .FirstOrDefaultAsync(
+                product => product.Id == id && product.IsActive,
+                cancellationToken);
+
     public async Task<IReadOnlyList<Product>> GetByIdsAsync(
         IReadOnlyCollection<int> ids,
         CancellationToken cancellationToken) =>
@@ -70,4 +77,30 @@ public sealed class ProductRepository(StoreDbContext dbContext) : IProductReposi
             .Include(category => category.Products)
             .OrderBy(category => category.DisplayOrder)
             .ToArrayAsync(cancellationToken);
+
+    public Task<Category?> GetCategoryByIdAsync(int id, CancellationToken cancellationToken) =>
+        dbContext.Categories.FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
+
+    public Task<Category?> GetCategoryByNameAsync(string name, CancellationToken cancellationToken) =>
+        dbContext.Categories.FirstOrDefaultAsync(c => c.Name.ToLower() == name.Trim().ToLower(), cancellationToken);
+
+    public async Task<Product> AddAsync(Product product, CancellationToken cancellationToken)
+    {
+        await dbContext.Products.AddAsync(product, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
+        return product;
+    }
+
+    public async Task UpdateAsync(Product product, CancellationToken cancellationToken)
+    {
+        dbContext.Products.Update(product);
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeleteAsync(Product product, CancellationToken cancellationToken)
+    {
+        product.IsActive = false;
+        dbContext.Products.Update(product);
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
 }
