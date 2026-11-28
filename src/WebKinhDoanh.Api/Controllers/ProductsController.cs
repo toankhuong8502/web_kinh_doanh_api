@@ -36,7 +36,7 @@ public sealed class ProductsController(IProductService products) : ApiController
         CancellationToken cancellationToken)
     {
         var result = await products.CreateProductAsync(request, cancellationToken);
-        return StatusCode(StatusCodes.Status201Created, Success(result, "Thêm sản phẩm thành công."));
+        return Success(result, "Thêm sản phẩm thành công.");
     }
 
     [HttpPut("{id:int}")]
