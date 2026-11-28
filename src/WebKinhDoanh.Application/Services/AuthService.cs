@@ -92,6 +92,11 @@ public sealed class AuthService(IUserRepository users) : IAuthService
             throw new AppException(400, "Mật khẩu mới và xác nhận mật khẩu không khớp.");
         }
 
+        if (request.NewPassword.Trim() == request.OldPassword.Trim())
+        {
+            throw new AppException(400, "Mật khẩu mới không được trùng với mật khẩu cũ.");
+        }
+
         var user = await users.GetByUsernameOrEmailAsync(request.Username.Trim(), cancellationToken);
         if (user is null)
         {
